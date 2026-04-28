@@ -57,6 +57,8 @@ Return a valid JSON object:
 
     for (const modelName of modelsToTry) {
       try {
+        console.info(`[Nexus] Attempting orchestration with model: ${modelName}`);
+        
         const response = await ai.models.generateContent({
           model: modelName,
           contents,
@@ -75,9 +77,22 @@ Return a valid JSON object:
         });
 
         if (!response.text) throw new Error("Empty response from model");
-        return JSON.parse(response.text) as LandingPageResult;
+        
+        const parsed = JSON.parse(response.text) as LandingPageResult;
+        console.info(`[Nexus] Successfully orchestrated using ${modelName}`);
+        console.info(`[Nexus] Generated ${parsed.code.length} chars of code.`);
+        
+        if (parsed.logs && parsed.logs.length > 0) {
+          console.group('[Nexus] Agent Trace');
+          parsed.logs.forEach(log => {
+            console.log(`[${log.agentName}] (${log.agentRole}): ${log.message}`);
+          });
+          console.groupEnd();
+        }
+        
+        return parsed;
       } catch (err: any) {
-        console.warn(`Model ${modelName} failed context:`, err);
+        console.error(`[Nexus] Model ${modelName} failed context:`, err.message);
         lastError = err;
       }
     }

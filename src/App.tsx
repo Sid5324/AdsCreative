@@ -15,10 +15,10 @@ import {
 } from 'lucide-react';
 import { NexusService } from './services/nexusService';
 import { LandingPageResult } from './types';
-import { TraceTerminal } from './components/TraceTerminal';
 import { DTRView } from './components/DTRView';
 import { PreviewPane } from './components/PreviewPane';
 import { templates } from './templates';
+import { put } from '@vercel/blob';
 
 export default function App() {
   const [adUrl, setAdUrl] = React.useState('');
@@ -31,12 +31,18 @@ export default function App() {
   const [error, setError] = React.useState<string | null>(null);
   const [showSettings, setShowSettings] = React.useState(false);
   const [userGeminiKey, setUserGeminiKey] = React.useState(() => localStorage.getItem('nexus_gemini_key') || '');
+  const [vercelBlobToken, setVercelBlobToken] = React.useState(() => localStorage.getItem('nexus_blob_token') || '');
 
   const fileInputRef = React.useRef<HTMLInputElement>(null);
 
   const saveKey = (key: string) => {
     setUserGeminiKey(key);
     localStorage.setItem('nexus_gemini_key', key);
+  };
+
+  const saveBlobToken = (token: string) => {
+    setVercelBlobToken(token);
+    localStorage.setItem('nexus_blob_token', token);
   };
 
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -78,14 +84,34 @@ export default function App() {
     setError(null);
     setResult(null);
 
+    console.info(`[Nexus] Initialization: Brand=${brandUrl}`);
+
     try {
       let adImageInput: { url?: string; base64?: { data: string; mimeType: string } } = {};
       let actualImageSource = '';
       
       if (adFile) {
-        const base64Data = await fileToBase64(adFile);
-        adImageInput.base64 = base64Data;
-        actualImageSource = adPreview || '';
+        if (vercelBlobToken) {
+          try {
+            console.info(`[Nexus] Uploading to Vercel Blob...`);
+            const blob = await put(`ad-creatives/${adFile.name}`, adFile, {
+              access: 'public',
+              token: vercelBlobToken
+            });
+            adImageInput.url = blob.url;
+            actualImageSource = blob.url;
+            console.info(`[Nexus] Blob Upload Success: ${blob.url}`);
+          } catch (blobErr: any) {
+            console.error(`[Nexus] Vercel Blob failed, falling back to base64:`, blobErr.message);
+            const base64Data = await fileToBase64(adFile);
+            adImageInput.base64 = base64Data;
+            actualImageSource = adPreview || '';
+          }
+        } else {
+          const base64Data = await fileToBase64(adFile);
+          adImageInput.base64 = base64Data;
+          actualImageSource = adPreview || '';
+        }
       } else {
         adImageInput.url = adUrl;
         actualImageSource = adUrl;
@@ -102,15 +128,15 @@ export default function App() {
       
       setResult(data);
     } catch (err: any) {
-      setError(`System Failure: ${err?.message || 'Orchestration interrupted. Please check network and API credentials.'}`);
-      console.error(err);
+      setError(`System Failure: ${err?.message || 'Orchestration interrupted. Check logs.'}`);
+      console.error(`[Nexus] Orchestration Failure:`, err);
     } finally {
       setIsProcessing(false);
     }
   };
 
   return (
-    <div className="min-h-screen flex flex-col font-sans">
+    <div className="min-h-screen flex flex-col font-sans bg-nexus-bg">
       {/* Settings Modal */}
       <AnimatePresence>
         {showSettings && (
@@ -118,46 +144,67 @@ export default function App() {
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
-            className="fixed inset-0 z-[100] flex items-center justify-center bg-black/80 backdrop-blur-sm p-4"
+            className="fixed inset-0 z-[100] flex items-center justify-center bg-black/90 backdrop-blur-md p-4"
           >
             <motion.div 
-              initial={{ scale: 0.95, opacity: 0 }}
-              animate={{ scale: 1, opacity: 1 }}
-              exit={{ scale: 0.95, opacity: 0 }}
-              className="glass-card w-full max-w-md p-8 rounded-sm relative"
+              initial={{ scale: 0.98, opacity: 0, y: 10 }}
+              animate={{ scale: 1, opacity: 1, y: 0 }}
+              exit={{ scale: 0.98, opacity: 0, y: 10 }}
+              className="glass-card w-full max-w-xl p-10 rounded-sm relative border-nexus-accent/20"
             >
               <button 
                 onClick={() => setShowSettings(false)}
-                className="absolute top-4 right-4 text-gray-500 hover:text-white"
+                className="absolute top-6 right-6 text-gray-500 hover:text-white transition-colors"
+                title="Close"
               >
-                <X size={20} />
+                <X size={24} />
               </button>
               
-              <div className="flex items-center gap-3 mb-6 font-mono">
-                <ShieldAlert size={18} className="text-nexus-accent" />
-                <h2 className="tech-label text-white text-base">Security_Override</h2>
+              <div className="flex items-center gap-3 mb-10 pb-4 border-b border-nexus-border">
+                <ShieldAlert size={20} className="text-nexus-accent" />
+                <h2 className="tech-label text-white text-lg tracking-[0.2em]">Protocol_Config</h2>
               </div>
               
-              <div className="space-y-6">
-                <div className="space-y-3">
-                  <label className="tech-label">User_Gemini_Key</label>
+              <div className="space-y-10">
+                <div className="space-y-4">
+                  <div className="flex items-center justify-between">
+                    <label className="tech-label text-gray-300">Google Gemini API Key</label>
+                    <span className="text-[9px] font-mono text-gray-600">ENCRYPTED_LOCAL_STORAGE</span>
+                  </div>
                   <input 
                     type="password"
-                    placeholder="PASTE_API_KEY"
-                    className="w-full bg-nexus-bg border border-nexus-border rounded-sm px-4 py-4 text-[13px] text-gray-200 focus:outline-none focus:border-nexus-accent transition-all placeholder:text-gray-800 font-mono"
+                    placeholder="ENTER_GEMINI_API_KEY"
+                    className="w-full bg-nexus-bg border border-nexus-border rounded-sm px-6 py-5 text-[14px] text-gray-200 focus:outline-none focus:border-nexus-accent transition-all placeholder:text-gray-800 font-mono"
                     value={userGeminiKey}
                     onChange={(e) => saveKey(e.target.value)}
                   />
-                  <p className="text-[10px] text-gray-500 italic mt-2">
-                    Used as priority stream if provided. Defaults to server protocol.
+                  <p className="text-[10px] text-gray-600 italic">
+                    Overrides system default. Recommended for production high-volume sessions.
+                  </p>
+                </div>
+
+                <div className="space-y-4 pt-4 border-t border-nexus-border/50">
+                  <div className="flex items-center justify-between">
+                    <label className="tech-label text-gray-300">Vercel Blob Token</label>
+                    <span className="text-[9px] font-mono text-nexus-accent">IMAGE_HOSTING_ACTIVE</span>
+                  </div>
+                  <input 
+                    type="password"
+                    placeholder="ENTER_VERCEL_BLOB_READ_WRITE_TOKEN"
+                    className="w-full bg-nexus-bg border border-nexus-border rounded-sm px-6 py-5 text-[14px] text-gray-200 focus:outline-none focus:border-nexus-accent transition-all placeholder:text-gray-800 font-mono"
+                    value={vercelBlobToken}
+                    onChange={(e) => saveBlobToken(e.target.value)}
+                  />
+                  <p className="text-[10px] text-gray-600 italic">
+                    Required for hosting local creatives. Get this from your Vercel Project Settings.
                   </p>
                 </div>
                 
                 <button 
                   onClick={() => setShowSettings(false)}
-                  className="w-full py-4 bg-nexus-accent text-white rounded-sm font-mono uppercase tracking-[0.2em] text-[10px] hover:bg-blue-600 transition-all font-bold"
+                  className="w-full py-5 bg-white text-nexus-bg rounded-sm font-mono uppercase tracking-[0.3em] text-[12px] hover:bg-nexus-accent hover:text-white transition-all font-bold shadow-2xl active:scale-[0.99]"
                 >
-                  Commit_Changes
+                  Confirm_Settings
                 </button>
               </div>
             </motion.div>
@@ -166,24 +213,24 @@ export default function App() {
       </AnimatePresence>
 
       {/* Header */}
-      <header className="h-16 border-b border-nexus-border bg-nexus-bg/80 backdrop-blur-md sticky top-0 z-50 flex items-center px-8 gap-4">
-        <div className="flex items-center gap-3">
-          <div className="w-10 h-10 rounded-sm bg-nexus-accent flex items-center justify-center shadow-lg shadow-blue-500/10 rotate-45">
-            <Zap size={20} className="text-white -rotate-45" />
-          </div>
-          <div className="flex flex-col ml-1">
-            <h1 className="text-[16px] font-bold tracking-tight text-white uppercase leading-none italic">Nexus ACE</h1>
-            <span className="text-[9px] text-nexus-accent font-mono uppercase tracking-[0.2em] mt-1.5 opacity-80">Orchestration Core 2.5</span>
+      <header className="h-20 border-b border-nexus-border bg-nexus-bg/90 backdrop-blur-xl sticky top-0 z-50 flex items-center px-10 gap-4">
+        <div className="flex items-center gap-4">
+           <div className="bg-nexus-accent p-2.5 rounded-sm shadow-[0_0_15px_rgba(59,130,246,0.3)]">
+            <Zap size={22} className="text-white" />
+           </div>
+          <div className="flex flex-col">
+            <h1 className="text-[18px] font-black tracking-tight text-white uppercase italic leading-none">adcreative ACE</h1>
+            <span className="text-[10px] text-nexus-accent font-mono uppercase tracking-[0.25em] mt-2 font-bold">Nexus_Orchestrator v2.5.12</span>
           </div>
         </div>
         
-        <div className="ml-auto flex items-center gap-4">
+        <div className="ml-auto flex items-center gap-6">
           <button 
             onClick={() => setShowSettings(true)}
-            className="flex items-center gap-2 px-4 py-2 rounded-sm border border-nexus-border bg-nexus-surface/50 hover:border-nexus-accent transition-all group"
+            className="flex items-center gap-3 px-5 py-2.5 rounded-sm border border-nexus-border bg-nexus-surface/80 hover:border-nexus-accent hover:bg-nexus-accent/5 transition-all group font-mono"
           >
-            <ShieldAlert size={14} className="text-gray-500 group-hover:text-nexus-accent" />
-            <span className="tech-label group-hover:text-white">Settings</span>
+            <ShieldAlert size={15} className="text-gray-600 group-hover:text-nexus-accent" />
+            <span className="tech-label text-gray-400 group-hover:text-white">Settings_Node</span>
           </button>
 
           <div className="flex items-center gap-3 px-4 py-2 rounded border border-nexus-border bg-nexus-surface/50">

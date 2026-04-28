@@ -9,29 +9,32 @@ interface DTRViewProps {
 export const DTRView: React.FC<DTRViewProps> = ({ dtr }) => {
   if (!dtr) {
     return (
-      <div className="p-8 border border-dashed border-gray-700 rounded-lg text-center text-gray-500 italic">
-        Design tokens will appear here after analysis.
+      <div className="p-12 border border-dashed border-nexus-border rounded-sm text-center bg-nexus-bg/30">
+        <div className="tech-label opacity-40 mb-2">Awaiting Analysis</div>
+        <p className="text-[10px] text-gray-700 italic">tokens_null : registry_empty</p>
       </div>
     );
   }
 
+  const colors = dtr.colors || {};
+
   return (
-    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+    <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
       {/* Colors */}
-      <div className="p-4 bg-[#1a1d23] border border-[#2d3139] rounded-lg">
-        <div className="flex items-center gap-2 mb-4">
-          <Palette size={16} className="text-pink-400" />
-          <h3 className="text-xs font-mono uppercase tracking-widest text-gray-400">Palette_Registry</h3>
+      <div className="p-6 bg-nexus-surface/50 border border-nexus-border rounded-sm">
+        <div className="flex items-center gap-3 mb-6">
+          <Palette size={14} className="text-nexus-accent" />
+          <h3 className="tech-label italic">Chromesthesia Registry</h3>
         </div>
-        <div className="space-y-3">
-          {Object.entries(dtr.colors).map(([key, value]) => (
-            <div key={key} className="flex items-center justify-between">
-              <span className="text-[11px] font-mono text-gray-500 uppercase">{key}</span>
-              <div className="flex items-center gap-2">
-                <span className="text-xs font-mono text-gray-300">{value}</span>
+        <div className="space-y-4">
+          {Object.entries(colors).map(([key, value]) => (
+            <div key={key} className="flex items-center justify-between group">
+              <span className="text-[11px] font-mono text-gray-500 uppercase tracking-tighter group-hover:text-gray-400 transition-colors">{key}</span>
+              <div className="flex items-center gap-3">
+                <span className="text-[11px] font-mono text-gray-300 opacity-60 group-hover:opacity-100 transition-opacity">{value}</span>
                 <div 
-                  className="w-4 h-4 rounded-sm border border-white/10" 
-                  style={{ backgroundColor: value }}
+                  className="w-5 h-5 rounded-sm border border-white/5 shadow-inner" 
+                  style={{ backgroundColor: value as string }}
                 />
               </div>
             </div>
