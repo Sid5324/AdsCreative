@@ -1,0 +1,31 @@
+@import "tailwindcss";
+
+@theme {
+  --color-nexus-bg: #0a0c10;
+  --color-nexus-surface: #0f1115;
+  --color-nexus-border: #2d3139;
+}
+
+@layer base {
+  body {
+    @apply bg-nexus-bg text-gray-200 antialiased selection:bg-blue-500/30;
+  }
+}
+
+.custom-scrollbar::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+
+.custom-scrollbar::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.custom-scrollbar::-webkit-scrollbar-thumb {
+  background: #2d3139;
+  border-radius: 10px;
+}
+
+.custom-scrollbar::-webkit-scrollbar-thumb:hover {
+  background: #3d424d;
+}
