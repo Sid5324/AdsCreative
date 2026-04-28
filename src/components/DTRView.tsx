@@ -16,7 +16,9 @@ export const DTRView: React.FC<DTRViewProps> = ({ dtr }) => {
     );
   }
 
-  const colors = dtr.colors || {};
+  const colors = dtr?.colors || {};
+  const typography = dtr?.typography || { displayFont: 'Default Sans', bodyFont: 'Default Serif', monoFont: 'Default Mono' };
+  const geometry = dtr?.geometry || { borderRadius: '0.25rem', spacingUnit: '1rem', containerWidth: '1200px' };
 
   return (
     <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
@@ -34,7 +36,7 @@ export const DTRView: React.FC<DTRViewProps> = ({ dtr }) => {
                 <span className="text-[11px] font-mono text-gray-300 opacity-60 group-hover:opacity-100 transition-opacity">{value}</span>
                 <div 
                   className="w-5 h-5 rounded-sm border border-white/5 shadow-inner" 
-                  style={{ backgroundColor: value as string }}
+                  style={{ backgroundColor: (value as string) || 'transparent' }}
                 />
               </div>
             </div>
@@ -52,11 +54,11 @@ export const DTRView: React.FC<DTRViewProps> = ({ dtr }) => {
           <div className="space-y-2">
             <div className="flex flex-col">
               <span className="text-[10px] text-gray-600 uppercase font-bold mb-1">Display</span>
-              <span className="text-sm text-gray-200">{dtr.typography.displayFont}</span>
+              <span className="text-sm text-gray-200">{typography.displayFont}</span>
             </div>
             <div className="flex flex-col">
               <span className="text-[10px] text-gray-600 uppercase font-bold mb-1">Body</span>
-              <span className="text-sm text-gray-200">{dtr.typography.bodyFont}</span>
+              <span className="text-sm text-gray-200">{typography.bodyFont}</span>
             </div>
           </div>
         </div>
@@ -69,11 +71,11 @@ export const DTRView: React.FC<DTRViewProps> = ({ dtr }) => {
           <div className="grid grid-cols-2 gap-2">
             <div>
               <span className="text-[10px] text-gray-600 uppercase font-bold block mb-1">Radius</span>
-              <span className="text-xs text-gray-200 font-mono">{dtr.geometry.borderRadius}</span>
+              <span className="text-xs text-gray-200 font-mono">{geometry.borderRadius}</span>
             </div>
             <div>
               <span className="text-[10px] text-gray-600 uppercase font-bold block mb-1">Spacing</span>
-              <span className="text-xs text-gray-200 font-mono">{dtr.geometry.spacingUnit}</span>
+              <span className="text-xs text-gray-200 font-mono">{geometry.spacingUnit}</span>
             </div>
           </div>
         </div>

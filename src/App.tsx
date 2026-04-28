@@ -18,7 +18,7 @@ import { LandingPageResult } from './types';
 import { DTRView } from './components/DTRView';
 import { PreviewPane } from './components/PreviewPane';
 import { templates } from './templates';
-import { put } from '@vercel/blob';
+// import { put } from '@vercel/blob'; // Using server-side proxy
 
 export default function App() {
   const [adUrl, setAdUrl] = React.useState('');
@@ -93,16 +93,28 @@ export default function App() {
       if (adFile) {
         if (vercelBlobToken) {
           try {
-            console.info(`[Nexus] Uploading to Vercel Blob...`);
-            const blob = await put(`ad-creatives/${adFile.name}`, adFile, {
-              access: 'public',
-              token: vercelBlobToken
+            console.info(`[Nexus] Uploading via Server Proxy...`);
+            const base64ForUpload = await fileToBase64(adFile);
+            
+            const uploadResponse = await fetch("/api/upload", {
+              method: "POST",
+              headers: { "Content-Type": "application/json" },
+              body: JSON.stringify({
+                fileName: `ad-creatives/${Date.now()}-${adFile.name}`,
+                fileData: base64ForUpload.data,
+                mimeType: adFile.type,
+                token: vercelBlobToken
+              })
             });
+
+            if (!uploadResponse.ok) throw new Error("Upload proxy failed");
+            
+            const blob = await uploadResponse.json();
             adImageInput.url = blob.url;
             actualImageSource = blob.url;
             console.info(`[Nexus] Blob Upload Success: ${blob.url}`);
           } catch (blobErr: any) {
-            console.error(`[Nexus] Vercel Blob failed, falling back to base64:`, blobErr.message);
+            console.error(`[Nexus] Vercel Blob proxy failed, falling back to local base64:`, blobErr.message);
             const base64Data = await fileToBase64(adFile);
             adImageInput.base64 = base64Data;
             actualImageSource = adPreview || '';
