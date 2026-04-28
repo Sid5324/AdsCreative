@@ -335,16 +335,6 @@ export default function App() {
               </button>
             </form>
           </section>
-
-          <section className="space-y-4 opacity-50 grayscale hover:grayscale-0 hover:opacity-100 transition-all">
-            <div className="flex items-center gap-2 border-b border-nexus-border pb-2">
-              <div className="w-1 h-1 rounded-full bg-nexus-accent" />
-              <span className="tech-label">Operational Manifest v2.5</span>
-            </div>
-            <p className="text-[10px] text-gray-600 font-mono leading-relaxed">
-              Nexus-ACE ensures brand consistency across digital verticals through automated design token mapping and spatial rendering.
-            </p>
-          </section>
         </div>
 
         {/* Right Column: Analysis & Production */}
