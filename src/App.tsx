@@ -18,7 +18,7 @@ import { LandingPageResult } from './types';
 import { DTRView } from './components/DTRView';
 import { PreviewPane } from './components/PreviewPane';
 import { templates } from './templates';
-// import { put } from '@vercel/blob'; // Using server-side proxy
+import { put } from '@vercel/blob';
 
 export default function App() {
   const [adUrl, setAdUrl] = React.useState('');
@@ -84,7 +84,8 @@ export default function App() {
     setError(null);
     setResult(null);
 
-    console.info(`[Nexus] Initialization: Brand=${brandUrl}`);
+    console.log("%c[NEXUS] BOOT_SEQUENCE_INITIALIZED", "color: #3b82f6; font-weight: bold;");
+    console.info(`[Nexus] Target Brand: ${brandUrl}`);
 
     try {
       let adImageInput: { url?: string; base64?: { data: string; mimeType: string } } = {};
@@ -93,33 +94,22 @@ export default function App() {
       if (adFile) {
         if (vercelBlobToken) {
           try {
-            console.info(`[Nexus] Uploading via Server Proxy...`);
-            const base64ForUpload = await fileToBase64(adFile);
-            
-            const uploadResponse = await fetch("/api/upload", {
-              method: "POST",
-              headers: { "Content-Type": "application/json" },
-              body: JSON.stringify({
-                fileName: `ad-creatives/${Date.now()}-${adFile.name}`,
-                fileData: base64ForUpload.data,
-                mimeType: adFile.type,
-                token: vercelBlobToken
-              })
+            console.info(`[Nexus] Protocol: Remote_Blob_Storage_Upload`);
+            const blob = await put(`ad-creatives/${Date.now()}-${adFile.name}`, adFile, {
+              access: 'public',
+              token: vercelBlobToken
             });
-
-            if (!uploadResponse.ok) throw new Error("Upload proxy failed");
-            
-            const blob = await uploadResponse.json();
             adImageInput.url = blob.url;
             actualImageSource = blob.url;
-            console.info(`[Nexus] Blob Upload Success: ${blob.url}`);
+            console.info(`[Nexus] Blob_Storage_Link: ${blob.url}`);
           } catch (blobErr: any) {
-            console.error(`[Nexus] Vercel Blob proxy failed, falling back to local base64:`, blobErr.message);
+            console.warn(`[Nexus] Remote storage failed. Falling back to Local_Buffer.`, blobErr.message);
             const base64Data = await fileToBase64(adFile);
             adImageInput.base64 = base64Data;
             actualImageSource = adPreview || '';
           }
         } else {
+          console.info(`[Nexus] Protocol: Local_Buffer_Mode (No Blob Token)`);
           const base64Data = await fileToBase64(adFile);
           adImageInput.base64 = base64Data;
           actualImageSource = adPreview || '';
@@ -140,8 +130,8 @@ export default function App() {
       
       setResult(data);
     } catch (err: any) {
+      console.error(`[CRITICAL_FAILURE]`, err);
       setError(`System Failure: ${err?.message || 'Orchestration interrupted. Check logs.'}`);
-      console.error(`[Nexus] Orchestration Failure:`, err);
     } finally {
       setIsProcessing(false);
     }
