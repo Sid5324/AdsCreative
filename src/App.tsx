@@ -18,7 +18,7 @@ import { LandingPageResult } from './types';
 import { DTRView } from './components/DTRView';
 import { PreviewPane } from './components/PreviewPane';
 import { templates } from './templates';
-import { put } from '@vercel/blob';
+// import { put } from '@vercel/blob'; // Using server-side proxy
 
 export default function App() {
   const [adUrl, setAdUrl] = React.useState('');
@@ -92,29 +92,39 @@ export default function App() {
       let actualImageSource = '';
       
       if (adFile) {
-        if (vercelBlobToken) {
-          try {
-            console.info(`[Nexus] Protocol: Remote_Blob_Storage_Upload`);
-            const blob = await put(`ad-creatives/${Date.now()}-${adFile.name}`, adFile, {
-              access: 'public',
-              token: vercelBlobToken
-            });
-            adImageInput.url = blob.url;
-            actualImageSource = blob.url;
-            console.info(`[Nexus] Blob_Storage_Link: ${blob.url}`);
-          } catch (blobErr: any) {
-            console.warn(`[Nexus] Remote storage failed. Falling back to Local_Buffer.`, blobErr.message);
-            const base64Data = await fileToBase64(adFile);
-            adImageInput.base64 = base64Data;
-            actualImageSource = adPreview || '';
+        console.info(`[Nexus] Processing Ad Media...`);
+        try {
+          console.log("%c[Nexus] Protocol: Server_Proxy_Upload", "color: #3b82f6; font-weight: bold;");
+          const base64ForUpload = await fileToBase64(adFile);
+          
+          const uploadResponse = await fetch("/api/upload", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({
+              fileName: `ad-creatives/${Date.now()}-${adFile.name}`,
+              fileData: base64ForUpload.data,
+              mimeType: adFile.type,
+              userBlobToken: vercelBlobToken
+            })
+          });
+
+          if (!uploadResponse.ok) {
+            const errorText = await uploadResponse.text();
+            throw new Error(`Upload proxy failed: ${errorText}`);
           }
-        } else {
-          console.info(`[Nexus] Protocol: Local_Buffer_Mode (No Blob Token)`);
+          
+          const blob = await uploadResponse.json();
+          adImageInput.url = blob.url;
+          actualImageSource = blob.url;
+          console.info(`[Nexus] Remote_Resource_Link: ${blob.url}`);
+        } catch (blobErr: any) {
+          console.warn(`[Nexus] Remote storage protocol failed. Reverting to Local_Buffer.`, blobErr.message);
           const base64Data = await fileToBase64(adFile);
           adImageInput.base64 = base64Data;
           actualImageSource = adPreview || '';
         }
       } else {
+        console.info(`[Nexus] Protocol: URL_Reference_Mode`);
         adImageInput.url = adUrl;
         actualImageSource = adUrl;
       }
@@ -181,7 +191,7 @@ export default function App() {
                     onChange={(e) => saveKey(e.target.value)}
                   />
                   <p className="text-[10px] text-gray-600 italic">
-                    Overrides system default. Recommended for production high-volume sessions.
+                    Overrides system default (Environment Variable). Recommended for production high-volume sessions.
                   </p>
                 </div>
 
@@ -198,7 +208,7 @@ export default function App() {
                     onChange={(e) => saveBlobToken(e.target.value)}
                   />
                   <p className="text-[10px] text-gray-600 italic">
-                    Required for hosting local creatives. Get this from your Vercel Project Settings.
+                    Required if BLOB_READ_WRITE_TOKEN is not set in environment. Used for hosting local creatives.
                   </p>
                 </div>
                 
