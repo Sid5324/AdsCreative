@@ -29,8 +29,15 @@ export default function App() {
   const [isProcessing, setIsProcessing] = React.useState(false);
   const [result, setResult] = React.useState<LandingPageResult | null>(null);
   const [error, setError] = React.useState<string | null>(null);
+  const [showSettings, setShowSettings] = React.useState(false);
+  const [userGeminiKey, setUserGeminiKey] = React.useState(() => localStorage.getItem('nexus_gemini_key') || '');
 
   const fileInputRef = React.useRef<HTMLInputElement>(null);
+
+  const saveKey = (key: string) => {
+    setUserGeminiKey(key);
+    localStorage.setItem('nexus_gemini_key', key);
+  };
 
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
@@ -86,7 +93,7 @@ export default function App() {
 
       const templateObj = templates.find(t => t.id === selectedTemplate);
 
-      const data = await NexusService.orchestrate(brandUrl, adImageInput, templateObj);
+      const data = await NexusService.orchestrate(brandUrl, adImageInput, templateObj, userGeminiKey);
       
       // Inject actual image source into placeholder
       if (data.code && actualImageSource) {
@@ -104,6 +111,60 @@ export default function App() {
 
   return (
     <div className="min-h-screen flex flex-col font-sans">
+      {/* Settings Modal */}
+      <AnimatePresence>
+        {showSettings && (
+          <motion.div 
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            className="fixed inset-0 z-[100] flex items-center justify-center bg-black/80 backdrop-blur-sm p-4"
+          >
+            <motion.div 
+              initial={{ scale: 0.95, opacity: 0 }}
+              animate={{ scale: 1, opacity: 1 }}
+              exit={{ scale: 0.95, opacity: 0 }}
+              className="glass-card w-full max-w-md p-8 rounded-sm relative"
+            >
+              <button 
+                onClick={() => setShowSettings(false)}
+                className="absolute top-4 right-4 text-gray-500 hover:text-white"
+              >
+                <X size={20} />
+              </button>
+              
+              <div className="flex items-center gap-3 mb-6 font-mono">
+                <ShieldAlert size={18} className="text-nexus-accent" />
+                <h2 className="tech-label text-white text-base">Security_Override</h2>
+              </div>
+              
+              <div className="space-y-6">
+                <div className="space-y-3">
+                  <label className="tech-label">User_Gemini_Key</label>
+                  <input 
+                    type="password"
+                    placeholder="PASTE_API_KEY"
+                    className="w-full bg-nexus-bg border border-nexus-border rounded-sm px-4 py-4 text-[13px] text-gray-200 focus:outline-none focus:border-nexus-accent transition-all placeholder:text-gray-800 font-mono"
+                    value={userGeminiKey}
+                    onChange={(e) => saveKey(e.target.value)}
+                  />
+                  <p className="text-[10px] text-gray-500 italic mt-2">
+                    Used as priority stream if provided. Defaults to server protocol.
+                  </p>
+                </div>
+                
+                <button 
+                  onClick={() => setShowSettings(false)}
+                  className="w-full py-4 bg-nexus-accent text-white rounded-sm font-mono uppercase tracking-[0.2em] text-[10px] hover:bg-blue-600 transition-all font-bold"
+                >
+                  Commit_Changes
+                </button>
+              </div>
+            </motion.div>
+          </motion.div>
+        )}
+      </AnimatePresence>
+
       {/* Header */}
       <header className="h-16 border-b border-nexus-border bg-nexus-bg/80 backdrop-blur-md sticky top-0 z-50 flex items-center px-8 gap-4">
         <div className="flex items-center gap-3">
@@ -117,6 +178,14 @@ export default function App() {
         </div>
         
         <div className="ml-auto flex items-center gap-4">
+          <button 
+            onClick={() => setShowSettings(true)}
+            className="flex items-center gap-2 px-4 py-2 rounded-sm border border-nexus-border bg-nexus-surface/50 hover:border-nexus-accent transition-all group"
+          >
+            <ShieldAlert size={14} className="text-gray-500 group-hover:text-nexus-accent" />
+            <span className="tech-label group-hover:text-white">Settings</span>
+          </button>
+
           <div className="flex items-center gap-3 px-4 py-2 rounded border border-nexus-border bg-nexus-surface/50">
             <div className="w-1.5 h-1.5 rounded-full bg-emerald-500 shadow-[0_0_8px_rgba(16,185,129,0.5)]" />
             <span className="tech-label text-emerald-500">System Ready</span>
@@ -267,17 +336,14 @@ export default function App() {
             </form>
           </section>
 
-          <section className="space-y-4">
-            <div className="flex items-center justify-between border-b border-nexus-border pb-2 px-1">
-              <div className="flex items-center gap-2">
-                <div className={`w-1.5 h-1.5 rounded-full ${result ? 'bg-emerald-500' : 'bg-nexus-accent'} animate-pulse`} />
-                <span className="tech-label">Terminal Trace</span>
-              </div>
-              {result && (
-                <span className="text-[9px] font-mono text-emerald-500 tracking-wider">SYNC_READY</span>
-              )}
+          <section className="space-y-4 opacity-50 grayscale hover:grayscale-0 hover:opacity-100 transition-all">
+            <div className="flex items-center gap-2 border-b border-nexus-border pb-2">
+              <div className="w-1 h-1 rounded-full bg-nexus-accent" />
+              <span className="tech-label">Operational Manifest v2.5</span>
             </div>
-            <TraceTerminal logs={result?.logs || []} />
+            <p className="text-[10px] text-gray-600 font-mono leading-relaxed">
+              Nexus-ACE ensures brand consistency across digital verticals through automated design token mapping and spatial rendering.
+            </p>
           </section>
         </div>
 
