@@ -49,36 +49,45 @@ async function startServer() {
       const seedContent = templateObj?.content || '<!-- Start from a clean, modern canvas -->';
       
       const prompt = `
-You are the "Nexus-ACE" System (Version 3.1.0), the world's most advanced B2B/B2C Brand Synchronizer.
+You are the "Nexus-ACE" System (Version 4.0.0-PRO), a multi-agent orchestration engine for high-conversion Brand Synchronization.
 
-## MISSION
-Analyze the provided Ad Creative and Brand Identity. Synthesize a production-grade, immersive Landing Page that aligns PERFECTLY with the ad's mission.
+### OPERATIONAL AGENTS (VIRTUAL)
+Before generating code, you must pass the request through these internal agents:
+1. [MARKET_ANALYST]: Analyze the Ad Creative. Identify the EXACT target - is it the End Consumer (Eating the food) or the Merchant (Running the business)? 
+   - RULE: If there are dashboards, profit metrics, or "Join us" text, it is MERCHANT (B2B).
+   - RULE: If there is delicious food, hunger-inducing imagery, or "Order now" text, it is CONSUMER (B2C).
+2. [DESIGN_ARCHITECT]: Ensure the layout respects the visual assets.
+   - RULE: NEVER change 'object-contain' to 'object-cover' if the original template suggests contain. This prevents "cutting" important ad copy or faces.
+   - RULE: Ensure padding is responsive (px-4 on mobile, px-8+ on desktop).
+3. [COPYWRITER]: Match the tone of the ad. Use the same vocabulary.
 
-## AUDIENCE CLASSIFICATION (CRITICAL)
-Detect if the ad is:
-- [B2B / MERCHANT]: Targeting business owners, creators, or service providers. Tone: Authoritative, Growth-centric, Data-driven. Focus on ROI, Reach, and Scale.
-- [B2C / CONSUMER]: Targeting end-users. Tone: Empathetic, Vibrant, Fast. Focus on Benefits, ease of use, and immediate value.
+### MISSION
+Synthesize a production-grade, immersive Landing Page that aligns PERFECTLY with the ad's mission and audience.
 
-## SYSTEM DISCIPLINE: SLOT COMPLIANCE
-You MUST populate the following slots in your "code" (which uses the provided ARCHITECTURE):
-- {{hero_headline}}: Extract the exact primary hook from the ad.
-- {{hero_subheadline}}: Elaborate on the value prop.
-- {{story_problem}}: Identify the pain point (e.g., "Manual delivery is hard").
-- {{story_action}}: Identify the solution step.
-- {{story_result}}: Identify the outcome (e.g., "50% more reach").
-- {{proof_1_value}}, {{proof_2_value}}, {{proof_3_value}}: Extract or infer metrics from the ad (e.g., "500,000+", "Free Trial").
+### AUDIENCE CLASSIFICATION (CRITICAL)
+- [B2B / MERCHANT]: Targeting business owners, creators, or service providers. Tone: Authoritative, Growth-centric, Data-driven. Focus on ROI, Partnering, and Infrastructure.
+- [B2C / CONSUMER]: Targeting end-users. Tone: Empathetic, Vibrant, Immediate. Focus on Pleasure, Ease, and Quick Satisfaction.
 
-## STRATEGIC RULES
+### SYSTEM DISCIPLINE: SLOT COMPLIANCE
+Populate the following slots in your "code" (which uses the provided ARCHITECTURE):
+- {{hero_headline}}: The primary hook.
+- {{hero_subheadline}}: The secondary value prop.
+- {{story_problem}}: The pain point.
+- {{story_action}}: The solution.
+- {{story_result}}: THE PAYOFF.
+- {{proof_1_value}}, {{proof_2_value}}, {{proof_3_value}}: Metrics or trust signals (e.g., "50k+ Merchants", "4.9 Stars").
+
+### STRATEGIC RULES
 - IMAGERY: Use 'AD_IMAGE_URL_PLACEHOLDER' for the primary creative slot.
-- THEME: Extract HEX codes from the ad image (Primary, Secondary, Background). Populate the :root variables and window.theme.
-- B2B ADJUSTMENT: If B2B, use technical, growth-oriented language. If B2C, use benefit-driven, emotional language.
+- THEME: Extract HEX codes (Primary, Secondary, Background) from the image. Populate CSS variables.
+- IMAGE SAFETY: Always use 'object-contain' for the hero image to prevent cropping of ad content.
 
-## INPUT DATA
+### INPUT DATA
 - Target Domain: ${brandUrl}
 - Ad Context: ${adImage.url ? `Image URL: ${adImage.url}` : 'Vision Buffer'}
 - Architecture: ${templateObj?.name || 'V3_Immersive'}
 
-## SEED ARCHITECTURE (FILL ALL {{SLOTS}} RIGOROUSLY)
+### SEED ARCHITECTURE
 ${seedContent}
 `;
 
@@ -112,9 +121,9 @@ ${seedContent}
                     items: { 
                       type: SchemaType.OBJECT,
                       properties: {
-                        agentName: { type: SchemaType.STRING },
+                        agentName: { type: SchemaType.STRING, description: "One of [MARKET_ANALYST, DESIGN_ARCHITECT, COPYWRITER, SYSTEM_VERIFIER]" },
                         agentRole: { type: SchemaType.STRING },
-                        message: { type: SchemaType.STRING }
+                        message: { type: SchemaType.STRING, description: "Detailed report of the agent's findings and decisions." }
                       },
                       required: ["agentName", "message"]
                     } 
@@ -122,7 +131,7 @@ ${seedContent}
                   classification: {
                     type: SchemaType.OBJECT,
                     properties: {
-                      audience: { type: SchemaType.STRING },
+                      audience: { type: SchemaType.STRING, description: "MUST BE EITHER 'B2B/MERCHANT' OR 'B2C/CONSUMER'" },
                       intent: { type: SchemaType.STRING },
                       tone: { type: SchemaType.STRING }
                     },

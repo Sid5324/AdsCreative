@@ -157,7 +157,9 @@ p {
 
   </div>
   <div class="relative w-full rounded-3xl overflow-hidden shadow-2xl border border-white/10 bg-white/5 p-2 lg:p-4 backdrop-blur-sm">
-    <img src="AD_IMAGE_URL_PLACEHOLDER" class="w-full h-[300px] md:h-[500px] object-contain rounded-2xl" />
+    <div class="aspect-video w-full bg-black/10 rounded-2xl overflow-hidden flex items-center justify-center">
+      <img src="AD_IMAGE_URL_PLACEHOLDER" class="w-full h-full object-contain" />
+    </div>
   </div>
 </div>
 </section>
@@ -400,8 +402,8 @@ p { max-width: 500px; }
 </div>
 
 <div class="card p-2 bg-surface shadow-xl w-full border border-border">
-<div class="bg-muted/10 rounded-lg overflow-hidden flex items-center justify-center relative">
-   <img src="AD_IMAGE_URL_PLACEHOLDER" class="w-full max-h-[300px] md:max-h-[450px] object-contain"/>
+<div class="aspect-video bg-muted/10 rounded-lg overflow-hidden flex items-center justify-center relative">
+   <img src="AD_IMAGE_URL_PLACEHOLDER" class="w-full h-full object-contain"/>
 </div>
 </div>
 
@@ -657,8 +659,8 @@ p { max-width: 650px; margin: auto; }
 <section id="story" class="px-4 md:px-8 py-12 md:py-20 -mt-10" data-editable="story">
 <div class="container mx-auto max-w-6xl">
   <div class="grid md:grid-cols-2 gap-8 items-center bg-white rounded-3xl shadow-xl border border-border overflow-hidden">
-    <div class="h-[300px] md:h-full min-h-[450px] bg-slate-50 p-4 md:p-8 flex items-center justify-center relative border-b md:border-b-0 md:border-r border-border">
-      <img src="AD_IMAGE_URL_PLACEHOLDER" class="w-full h-full object-cover rounded-xl shadow-lg" alt="Creative Narrative Image"/>
+    <div class="aspect-video md:aspect-auto md:h-full min-h-[450px] bg-slate-50 p-4 md:p-8 flex items-center justify-center relative border-b md:border-b-0 md:border-r border-border">
+      <img src="AD_IMAGE_URL_PLACEHOLDER" class="w-full h-full object-contain rounded-xl shadow-lg" alt="Creative Narrative Image"/>
     </div>
     <div class="p-6 md:p-12 text-center md:text-left">
       <div class="text-6xl text-primary/20 mb-[-20px] font-serif leading-none inline-block">"</div>
@@ -1121,8 +1123,8 @@ p { max-width: 600px; margin: auto; }
             </div>
             <div class="relative w-full mt-10 md:mt-0">
                 <div class="rounded-3xl overflow-hidden shadow-2xl transform lg:rotate-2 hover:rotate-0 transition-transform duration-700 bg-white p-3 border border-gray-100">
-                    <div class="relative bg-slate-50 rounded-2xl overflow-hidden flex items-center justify-center w-full">
-                      <img src="AD_IMAGE_URL_PLACEHOLDER" alt="Creative" class="w-full max-h-[350px] md:max-h-[550px] object-contain hover:scale-105 transition-transform duration-700">
+                    <div class="aspect-video relative bg-slate-50 rounded-2xl overflow-hidden flex items-center justify-center w-full">
+                      <img src="AD_IMAGE_URL_PLACEHOLDER" alt="Creative" class="w-full h-full object-contain hover:scale-105 transition-transform duration-700">
                     </div>
                 </div>
             </div>
