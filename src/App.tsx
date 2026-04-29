@@ -483,28 +483,51 @@ export default function App() {
             </div>
 
             <div className="flex-1 flex flex-col overflow-hidden relative">
-              {/* Registry Header - High Density */}
-              <div className="border-b border-nexus-border bg-nexus-surface/5 backdrop-blur-xl sticky top-0 z-20">
-                <div className="px-6 py-3 flex items-center justify-between">
-                  <div className="flex items-center gap-6">
-                    <div className="flex flex-col">
-                      <h3 className="tech-label text-[9px] uppercase tracking-[0.2em] text-nexus-accent leading-none mb-1">Brand Intelligence</h3>
-                      <span className="text-[8px] text-gray-700 font-mono">REGISTRY_V3.2 // SYNC_ACTIVE</span>
+              {/* Registry Header - Professional Density */}
+              <div className="border-b border-nexus-border bg-nexus-surface/10 backdrop-blur-xl sticky top-0 z-20">
+                <div className="px-4 sm:px-6 py-4 flex flex-col sm:flex-row sm:items-center justify-between gap-6">
+                  <div className="flex flex-wrap items-center gap-6 sm:gap-10">
+                    <div className="flex flex-col min-w-max">
+                      <h3 className="tech-label text-[11px] sm:text-xs uppercase tracking-[0.2em] text-nexus-accent leading-none mb-2 font-black">Brand Intelligence</h3>
+                      <div className="flex items-center gap-2">
+                        <span className="text-[10px] text-gray-400 font-mono flex items-center gap-2">
+                          <span className="w-1.5 h-1.5 rounded-full bg-nexus-accent animate-pulse" />
+                          NODE_SYNC_ACTIVE
+                        </span>
+                      </div>
                     </div>
-                    <div className="h-6 w-px bg-nexus-border/30" />
-                    <DTRView dtr={result?.dtr || null} isCompact />
+                    
+                    <div className="h-10 w-px bg-nexus-border/30 hidden lg:block" />
+                    
+                    {/* Professional Metadata Display */}
+                    <div className="hidden xl:flex items-center gap-12">
+                      <div className="flex flex-col gap-1.5">
+                        <span className="text-[10px] uppercase text-gray-500 font-black tracking-[0.2em]">Display_Font</span>
+                        <span className="text-xs text-white font-black leading-none group-light:text-slate-900 truncate max-w-[140px]">{result?.dtr?.typography?.displayFont?.split(',')[0] || '---'}</span>
+                      </div>
+                      <div className="flex flex-col gap-1.5">
+                        <span className="text-[10px] uppercase text-gray-500 font-black tracking-[0.2em]">Geom_Radius</span>
+                        <span className="text-xs text-emerald-400 font-mono font-black">{result?.dtr?.geometry?.borderRadius || '0px'}</span>
+                      </div>
+                      <div className="flex flex-col gap-1.5 max-w-[240px]">
+                        <span className="text-[10px] uppercase text-gray-500 font-black tracking-[0.2em]">Target_Reach</span>
+                        <span className="text-xs text-nexus-accent font-black truncate uppercase leading-none">
+                          {result?.dtr?.brandDna?.audience ? String(result.dtr.brandDna.audience) : 'PENDING_SIGNAL'}
+                        </span>
+                      </div>
+                    </div>
                   </div>
                   
-                  <div className="flex items-center gap-3">
+                  <div className="flex items-center w-full sm:w-auto">
                     <button 
                       onClick={() => setShowDTRDetails(!showDTRDetails)}
-                      className={`text-[9px] font-mono px-3 py-1.5 rounded-sm transition-all border ${
+                      className={`text-[10px] sm:text-xs font-black tracking-[0.15em] px-6 sm:px-8 py-3.5 sm:py-4 rounded-sm transition-all border shrink-0 w-full sm:w-auto min-w-0 sm:min-w-[200px] ${
                         showDTRDetails 
-                        ? 'bg-nexus-accent/10 border-nexus-accent text-nexus-accent' 
-                        : 'border-nexus-border/40 text-gray-500 hover:border-nexus-border'
+                        ? 'bg-nexus-accent text-white border-nexus-accent shadow-lg shadow-nexus-accent/30' 
+                        : 'bg-nexus-surface/80 border-nexus-border text-gray-400 hover:border-nexus-accent hover:text-white'
                       }`}
                     >
-                      {showDTRDetails ? '[ CLOSE_TOKENS ]' : '[ VIEW_TOKENS ]'}
+                      {showDTRDetails ? 'LOCK_REGISTRY' : 'INSPECT_REGISTRY'}
                     </button>
                   </div>
                 </div>
