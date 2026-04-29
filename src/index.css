@@ -10,18 +10,118 @@
 }
 
 @layer base {
+  .light-theme {
+    --color-nexus-bg: #f1f5f9;
+    --color-nexus-surface: #ffffff;
+    --color-nexus-accent: #2563eb;
+    --color-nexus-border: #cbd5e1;
+    --color-nexus-muted: #e2e8f0;
+  }
+
   body {
-    @apply bg-nexus-bg text-gray-200 antialiased selection:bg-nexus-accent/30 tracking-tight;
+    @apply bg-nexus-bg text-gray-200 antialiased selection:bg-nexus-accent/30 tracking-tight transition-colors duration-300;
+  }
+
+  .light-theme body {
+    @apply text-slate-900;
   }
 }
 
 @layer utilities {
   .glass-card {
-    @apply bg-nexus-surface/50 backdrop-blur-xl border border-nexus-border shadow-2xl;
+    @apply bg-nexus-surface/80 backdrop-blur-xl border border-nexus-border shadow-2xl;
+  }
+  
+  .light-theme .glass-card {
+    @apply bg-white/90 border-slate-200 shadow-xl;
   }
   
   .tech-label {
     @apply text-[10px] font-mono uppercase tracking-[0.14em] text-gray-500 font-medium;
+  }
+
+  .light-theme .tech-label {
+    @apply text-slate-500 font-bold;
+  }
+
+  .light-theme .text-gray-400 {
+    @apply text-slate-500;
+  }
+
+  .light-theme .text-gray-300 {
+    @apply text-slate-600;
+  }
+
+  .light-theme .text-gray-200 {
+    @apply text-slate-800;
+  }
+
+  .light-theme .text-gray-500 {
+    @apply text-slate-500;
+  }
+
+  .light-theme .text-gray-600 {
+    @apply text-slate-400;
+  }
+
+  .light-theme .text-gray-700 {
+    @apply text-slate-500 font-medium;
+  }
+
+  .light-theme .text-gray-800 {
+    @apply text-slate-400;
+  }
+
+  .light-theme .bg-nexus-surface\/80 {
+    @apply bg-white/90;
+  }
+
+  .light-theme .bg-nexus-surface\/50 {
+    @apply bg-white/60;
+  }
+  
+  .light-theme .bg-nexus-surface\/30 {
+    @apply bg-slate-50;
+  }
+
+  .light-theme .bg-nexus-surface\/5 {
+    @apply bg-slate-100/50;
+  }
+
+  .light-theme .bg-nexus-bg {
+    @apply bg-slate-50;
+  }
+
+  .light-theme .bg-gray-900\/40 {
+    @apply bg-slate-100;
+  }
+
+  .light-theme .border-white\/5,
+  .light-theme .border-white\/10,
+  .light-theme .border-white\/20 {
+    @apply border-slate-200;
+  }
+
+  .light-theme .bg-black\/40, 
+  .light-theme .bg-black\/20,
+  .light-theme .bg-black\/60 {
+    @apply bg-slate-200/50;
+  }
+
+  .light-theme .text-white {
+    @apply text-slate-900;
+  }
+
+  .light-theme .placeholder\:text-gray-800::placeholder {
+    @apply text-slate-300;
+  }
+
+  .light-theme .bg-white {
+    @apply bg-slate-900;
+  }
+
+  .light-theme .text-nexus-bg {
+    @apply text-white;
   }
 
   .glow-blue {

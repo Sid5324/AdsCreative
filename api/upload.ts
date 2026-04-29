@@ -7,7 +7,10 @@ export default async function handler(req, res) {
 
   try {
     const { fileName, fileData, mimeType, userBlobToken } = req.body;
-    const token = userBlobToken || process.env.BLOB_READ_WRITE_TOKEN || process.env.VITE_BLOB_READ_WRITE_TOKEN;
+    const token = userBlobToken || 
+                  process.env.BLOB_READ_WRITE_TOKEN || 
+                  process.env.VITE_BLOB_READ_WRITE_TOKEN || 
+                  process.env.Adcreative_READ_WRITE_TOKEN;
     
     if (!token) {
       console.error("[Nexus] Error: Blob token is missing.");

@@ -11,12 +11,16 @@ import {
   Sparkles,
   Upload,
   X,
-  LayoutTemplate
+  LayoutTemplate,
+  Sun,
+  Moon,
+  HelpCircle
 } from 'lucide-react';
 import { NexusService } from './services/nexusService';
 import { LandingPageResult } from './types';
 import { DTRView } from './components/DTRView';
 import { PreviewPane } from './components/PreviewPane';
+import { OnboardingModal } from './components/OnboardingModal';
 import { templates } from './templates';
 // import { put } from '@vercel/blob'; // Using server-side proxy
 
@@ -30,10 +34,36 @@ export default function App() {
   const [result, setResult] = React.useState<LandingPageResult | null>(null);
   const [error, setError] = React.useState<string | null>(null);
   const [showSettings, setShowSettings] = React.useState(false);
+  const [showDTRDetails, setShowDTRDetails] = React.useState(false);
+  const [theme, setTheme] = React.useState<'dark' | 'light'>(() => (localStorage.getItem('nexus_theme') as 'dark' | 'light') || 'dark');
+  const [showHelp, setShowHelp] = React.useState(false);
+
+  React.useEffect(() => {
+    const onboarded = localStorage.getItem('nexus_onboarded');
+    if (!onboarded) {
+      // Small delay to ensure everything is rendered
+      const timer = setTimeout(() => setShowHelp(true), 1000);
+      return () => clearTimeout(timer);
+    }
+  }, []);
   const [userGeminiKey, setUserGeminiKey] = React.useState(() => localStorage.getItem('nexus_gemini_key') || '');
   const [vercelBlobToken, setVercelBlobToken] = React.useState(() => localStorage.getItem('nexus_blob_token') || '');
 
   const fileInputRef = React.useRef<HTMLInputElement>(null);
+
+  React.useEffect(() => {
+    localStorage.setItem('nexus_theme', theme);
+    if (theme === 'light') {
+      document.body.classList.add('light-theme');
+    } else {
+      document.body.classList.remove('light-theme');
+    }
+  }, [theme]);
+
+  const closeHelp = () => {
+    setShowHelp(false);
+    localStorage.setItem('nexus_onboarded', 'true');
+  };
 
   const saveKey = (key: string) => {
     setUserGeminiKey(key);
@@ -148,7 +178,7 @@ export default function App() {
   };
 
   return (
-    <div className="min-h-screen flex flex-col font-sans bg-nexus-bg">
+    <div className={`min-h-screen flex flex-col font-sans bg-nexus-bg transition-colors duration-300 ${theme === 'light' ? 'light-theme' : ''}`}>
       {/* Settings Modal */}
       <AnimatePresence>
         {showSettings && (
@@ -156,17 +186,17 @@ export default function App() {
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
-            className="fixed inset-0 z-[100] flex items-center justify-center bg-black/90 backdrop-blur-md p-4"
+            className="fixed inset-0 z-[100] flex items-center justify-center bg-nexus-bg/80 backdrop-blur-md p-4"
           >
             <motion.div 
               initial={{ scale: 0.98, opacity: 0, y: 10 }}
               animate={{ scale: 1, opacity: 1, y: 0 }}
               exit={{ scale: 0.98, opacity: 0, y: 10 }}
-              className="glass-card w-full max-w-xl p-10 rounded-sm relative border-nexus-accent/20"
+              className="glass-card w-full max-w-xl p-10 rounded-sm relative border-nexus-border"
             >
               <button 
                 onClick={() => setShowSettings(false)}
-                className="absolute top-6 right-6 text-gray-500 hover:text-white transition-colors"
+                className="absolute top-6 right-6 text-gray-500 hover:text-nexus-accent transition-colors"
                 title="Close"
               >
                 <X size={24} />
@@ -180,7 +210,7 @@ export default function App() {
               <div className="space-y-10">
                 <div className="space-y-4">
                   <div className="flex items-center justify-between">
-                    <label className="tech-label text-gray-300">Google Gemini API Key</label>
+                    <label className="tech-label text-gray-300 font-bold">Google Gemini API Key</label>
                     <span className="text-[9px] font-mono text-gray-600">ENCRYPTED_LOCAL_STORAGE</span>
                   </div>
                   <input 
@@ -195,21 +225,16 @@ export default function App() {
                   </p>
                 </div>
 
-                <div className="space-y-4 pt-4 border-t border-nexus-border/50">
-                  <div className="flex items-center justify-between">
-                    <label className="tech-label text-gray-300">Vercel Blob Token</label>
-                    <span className="text-[9px] font-mono text-nexus-accent">IMAGE_HOSTING_ACTIVE</span>
-                  </div>
-                  <input 
-                    type="password"
-                    placeholder="ENTER_VERCEL_BLOB_READ_WRITE_TOKEN"
-                    className="w-full bg-nexus-bg border border-nexus-border rounded-sm px-6 py-5 text-[14px] text-gray-200 focus:outline-none focus:border-nexus-accent transition-all placeholder:text-gray-800 font-mono"
-                    value={vercelBlobToken}
-                    onChange={(e) => saveBlobToken(e.target.value)}
-                  />
-                  <p className="text-[10px] text-gray-600 italic">
-                    Required if BLOB_READ_WRITE_TOKEN is not set in environment. Used for hosting local creatives.
-                  </p>
+                <div className="pt-4 border-t border-nexus-border/50">
+                  <button 
+                    className="w-full nexus-button py-4 text-[13px] tracking-[0.2em] uppercase font-bold border border-nexus-border"
+                    onClick={() => {
+                      localStorage.clear();
+                      window.location.reload();
+                    }}
+                  >
+                    RESET_LOCAL_PROTOCOLS
+                  </button>
                 </div>
                 
                 <button 
@@ -237,6 +262,31 @@ export default function App() {
         </div>
         
         <div className="ml-auto flex items-center gap-6">
+          <div className="flex bg-nexus-surface/80 rounded-sm border border-nexus-border p-1">
+            <button 
+              onClick={() => setTheme('dark')}
+              className={`p-1.5 rounded transition-all ${theme === 'dark' ? 'bg-nexus-accent text-white' : 'text-gray-500 hover:text-gray-400'}`}
+              title="Dark Mode"
+            >
+              <Moon size={14} />
+            </button>
+            <button 
+              onClick={() => setTheme('light')}
+              className={`p-1.5 rounded transition-all ${theme === 'light' ? 'bg-nexus-accent text-white' : 'text-gray-500 hover:text-gray-400'}`}
+              title="Light Mode"
+            >
+              <Sun size={14} />
+            </button>
+          </div>
+
+          <button 
+            onClick={() => setShowHelp(true)}
+            className="p-2.5 rounded-sm border border-nexus-border bg-nexus-surface/80 text-gray-500 hover:text-nexus-accent hover:border-nexus-accent transition-all"
+            title="Help & Onboarding"
+          >
+            <HelpCircle size={14} />
+          </button>
+
           <button 
             onClick={() => setShowSettings(true)}
             className="flex items-center gap-3 px-5 py-2.5 rounded-sm border border-nexus-border bg-nexus-surface/80 hover:border-nexus-accent hover:bg-nexus-accent/5 transition-all group font-mono"
@@ -252,9 +302,9 @@ export default function App() {
         </div>
       </header>
 
-      <main className="flex-1 p-8 grid grid-cols-1 lg:grid-cols-12 gap-8 max-w-[1700px] mx-auto w-full">
+      <main className="flex-1 p-6 grid grid-cols-1 lg:grid-cols-[380px_1fr] gap-6 max-w-[1920px] mx-auto w-full h-[calc(100vh-80px)] overflow-hidden">
         {/* Left Column: Control Panel */}
-        <div className="lg:col-span-4 space-y-8">
+        <div className="space-y-6 overflow-y-auto pr-2 custom-scrollbar flex flex-col">
           <section className="glass-card rounded-sm p-8 relative overflow-hidden">
             <div className="absolute top-0 right-0 p-2 opacity-5 italic font-serif text-4xl pointer-events-none">ACE</div>
             
@@ -397,7 +447,7 @@ export default function App() {
         </div>
 
         {/* Right Column: Analysis & Production */}
-        <div className="lg:col-span-8 flex flex-col gap-8">
+        <div className="flex-1 flex flex-col gap-6 overflow-hidden h-full">
           <AnimatePresence mode="wait">
             {error && (
               <motion.div 
@@ -432,22 +482,80 @@ export default function App() {
               </div>
             </div>
 
-            <div className="flex-1 flex flex-col p-8 overflow-y-auto custom-scrollbar">
-              <div className="mb-12">
-                <div className="flex items-center justify-between mb-6">
-                  <h3 className="tech-label italic">Design Token Registry</h3>
-                  <div className="h-px bg-nexus-border flex-1 mx-6" />
+            <div className="flex-1 flex flex-col overflow-hidden relative">
+              {/* Registry Header - High Density */}
+              <div className="border-b border-nexus-border bg-nexus-surface/5 backdrop-blur-xl sticky top-0 z-20">
+                <div className="px-6 py-3 flex items-center justify-between">
+                  <div className="flex items-center gap-6">
+                    <div className="flex flex-col">
+                      <h3 className="tech-label text-[9px] uppercase tracking-[0.2em] text-nexus-accent leading-none mb-1">Brand Intelligence</h3>
+                      <span className="text-[8px] text-gray-700 font-mono">REGISTRY_V3.2 // SYNC_ACTIVE</span>
+                    </div>
+                    <div className="h-6 w-px bg-nexus-border/30" />
+                    <DTRView dtr={result?.dtr || null} isCompact />
+                  </div>
+                  
+                  <div className="flex items-center gap-3">
+                    <button 
+                      onClick={() => setShowDTRDetails(!showDTRDetails)}
+                      className={`text-[9px] font-mono px-3 py-1.5 rounded-sm transition-all border ${
+                        showDTRDetails 
+                        ? 'bg-nexus-accent/10 border-nexus-accent text-nexus-accent' 
+                        : 'border-nexus-border/40 text-gray-500 hover:border-nexus-border'
+                      }`}
+                    >
+                      {showDTRDetails ? '[ CLOSE_TOKENS ]' : '[ VIEW_TOKENS ]'}
+                    </button>
+                  </div>
                 </div>
-                <DTRView dtr={result?.dtr || null} />
+                
+                <AnimatePresence>
+                  {showDTRDetails && (
+                    <motion.div 
+                      initial={{ height: 0, opacity: 0 }}
+                      animate={{ height: 'auto', opacity: 1 }}
+                      exit={{ height: 0, opacity: 0 }}
+                      className="overflow-hidden border-t border-nexus-border/30 bg-black/60 shadow-inner max-h-[350px] overflow-y-auto custom-scrollbar"
+                    >
+                      <div className="p-8">
+                        <DTRView dtr={result?.dtr || null} />
+                      </div>
+                    </motion.div>
+                  )}
+                </AnimatePresence>
               </div>
 
-              <div className="flex-1 flex flex-col min-h-[500px]">
-                <div className="flex items-center justify-between mb-6">
-                  <h3 className="tech-label italic">V2 Spatial Renderer</h3>
-                  <div className="h-px bg-nexus-border flex-1 mx-6" />
+              {/* Main Renderer Stage - Maximized for Spatial Reach */}
+              <div className={`flex-1 flex flex-col overflow-hidden relative ${theme === 'light' ? 'bg-slate-100' : 'bg-slate-950'}`}>
+                {/* Status Bar - Integrated with Stage */}
+                <div className="px-6 py-2 bg-nexus-surface/80 border-b border-nexus-border flex items-center justify-between z-20 backdrop-blur-sm">
+                  <div className="flex items-center gap-3">
+                    <div className="w-1.5 h-1.5 rounded-full bg-nexus-accent animate-pulse" />
+                    <span className="text-[9px] font-black uppercase tracking-[0.3em] text-white">V3_Renderer_Live_Node</span>
+                  </div>
+                  <div className="flex items-center gap-6 text-[8px] font-mono text-gray-500">
+                    <div className="flex gap-2">
+                      <span className="opacity-40">SYNC_LOCK:</span>
+                      <span className={result ? "text-emerald-500" : "text-amber-500"}>{result ? "VERIFIED" : "WAITING"}</span>
+                    </div>
+                    <div className="flex gap-2">
+                      <span className="opacity-40">STAGE:</span>
+                      <span className="text-blue-500">PROD_EXPANSION</span>
+                    </div>
+                  </div>
                 </div>
-                <div className="flex-1 rounded-sm border border-nexus-border overflow-hidden bg-nexus-bg">
+
+                {/* Edge-to-Edge Stage */}
+                <div className="flex-1 relative bg-white shadow-2xl flex flex-col">
                   <PreviewPane code={result?.code || null} />
+                  {!result && (
+                    <div className="absolute inset-0 flex items-center justify-center bg-nexus-bg z-10">
+                      <div className="flex flex-col items-center gap-4 opacity-20">
+                        <div className="w-12 h-12 border-2 border-nexus-accent rounded-full animate-ping" />
+                        <span className="tech-label italic">Awaiting Spatial Input</span>
+                      </div>
+                    </div>
+                  )}
                 </div>
               </div>
             </div>
@@ -469,6 +577,10 @@ export default function App() {
         </div>
       </footer>
 
+      <OnboardingModal 
+        isOpen={showHelp}
+        onClose={closeHelp}
+      />
     </div>
   );
 }

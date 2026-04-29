@@ -135,7 +135,7 @@ p {
 <!-- =========================
    HERO (Editable)
 ========================= -->
-<section id="hero" class="relative py-24 md:py-32 px-6 flex items-center justify-center bg-background text-textPrimary overflow-hidden border-b border-white/5" data-editable="true">
+<section id="hero" class="relative py-24 md:py-32 px-6 flex items-center justify-center bg-background text-textPrimary overflow-hidden border-b border-white/5" data-editable="hero">
 <div class="absolute inset-0 z-0 opacity-20 pointer-events-none">
    <div class="absolute inset-0 bg-gradient-to-t from-background via-background/80 to-transparent z-10"></div>
    <img src="AD_IMAGE_URL_PLACEHOLDER" class="w-full h-full object-cover blur-3xl opacity-50" />
@@ -165,7 +165,7 @@ p {
 <!-- =========================
    FEATURES (Editable)
 ========================= -->
-<section id="features" class="section bg-white text-black" data-editable="true">
+<section id="features" class="section bg-white text-black" data-editable="features">
 
 <div class="text-center mb-16">
 
@@ -182,18 +182,18 @@ p {
 <div class="grid md:grid-cols-3 gap-8">
 
 <div class="card hover-scale">
-  <h3 class="text-white text-xl font-bold mb-2">{{feature_1_title}}</h3>
-  <p class="text-gray-400">{{feature_1_desc}}</p>
+  <h3 class="text-textPrimary text-xl font-bold mb-2">{{feature_1_title}}</h3>
+  <p class="text-textSecondary">{{feature_1_desc}}</p>
 </div>
 
 <div class="card hover-scale">
-  <h3 class="text-white text-xl font-bold mb-2">{{feature_2_title}}</h3>
-  <p class="text-gray-400">{{feature_2_desc}}</p>
+  <h3 class="text-textPrimary text-xl font-bold mb-2">{{feature_2_title}}</h3>
+  <p class="text-textSecondary">{{feature_2_desc}}</p>
 </div>
 
 <div class="card hover-scale">
-  <h3 class="text-white text-xl font-bold mb-2">{{feature_3_title}}</h3>
-  <p class="text-gray-400">{{feature_3_desc}}</p>
+  <h3 class="text-textPrimary text-xl font-bold mb-2">{{feature_3_title}}</h3>
+  <p class="text-textSecondary">{{feature_3_desc}}</p>
 </div>
 
 </div>
@@ -203,7 +203,7 @@ p {
 <!-- =========================
    VALUE (Editable)
 ========================= -->
-<section id="value" class="section bg-background text-center" data-editable="true">
+<section id="value" class="section bg-background text-center" data-editable="value">
 
 <h2 class="font-display text-4xl font-bold mb-6">
   {{value_title}}
@@ -218,7 +218,7 @@ p {
 <!-- =========================
    TRUST (Editable)
 ========================= -->
-<section id="trust" class="section bg-muted text-white text-center" data-editable="true">
+<section id="trust" class="section bg-muted text-white text-center" data-editable="trust">
 
 <h2 class="font-display text-3xl font-bold mb-4">
   {{trust_title}}
@@ -233,7 +233,7 @@ p {
 <!-- =========================
    CTA (Editable)
 ========================= -->
-<section id="cta" class="section bg-accent text-black text-center" data-editable="true">
+<section id="cta" class="section bg-accent text-black text-center" data-editable="cta">
 
 <h2 class="text-5xl font-black mb-8">
   {{final_cta_title}}
@@ -399,8 +399,8 @@ p { max-width: 500px; }
 </button>
 </div>
 
-<div class="card p-2 bg-white shadow-xl w-full border border-border">
-<div class="bg-gray-50 rounded-lg overflow-hidden flex items-center justify-center relative">
+<div class="card p-2 bg-surface shadow-xl w-full border border-border">
+<div class="bg-muted/10 rounded-lg overflow-hidden flex items-center justify-center relative">
    <img src="AD_IMAGE_URL_PLACEHOLDER" class="w-full max-h-[300px] md:max-h-[450px] object-contain"/>
 </div>
 </div>
@@ -640,10 +640,10 @@ p { max-width: 650px; margin: auto; }
 <body class="font-sans leading-relaxed">
 
 <section id="hero" class="section text-center bg-surface border-b border-border" data-editable="hero">
-<h1 class="text-4xl md:text-5xl font-extrabold mb-6 leading-tight">
+<h1 class="text-4xl md:text-5xl font-extrabold mb-6 leading-tight tracking-tight">
   {{hero_headline}}
 </h1>
-<p class="text-xl text-textSecondary mb-8 max-w-2xl mx-auto">
+<p class="text-xl text-textSecondary mb-8 max-w-2xl mx-auto font-medium">
   {{hero_subheadline}}
 </p>
 <button class="btn-primary text-lg">
@@ -653,21 +653,23 @@ p { max-width: 650px; margin: auto; }
 
 <!-- =========================
    STORY (USER PROOF)
-========================= -->
+ ========================= -->
 <section id="story" class="px-4 md:px-8 py-12 md:py-20 -mt-10" data-editable="story">
 <div class="container mx-auto max-w-6xl">
   <div class="grid md:grid-cols-2 gap-8 items-center bg-white rounded-3xl shadow-xl border border-border overflow-hidden">
-    <div class="h-[300px] md:h-full min-h-[400px] bg-slate-50 p-4 md:p-8 flex items-center justify-center relative border-b md:border-b-0 md:border-r border-border">
-      <img src="AD_IMAGE_URL_PLACEHOLDER" class="w-full h-full max-h-[500px] object-contain drop-shadow-lg"/>
+    <div class="h-[300px] md:h-full min-h-[450px] bg-slate-50 p-4 md:p-8 flex items-center justify-center relative border-b md:border-b-0 md:border-r border-border">
+      <img src="AD_IMAGE_URL_PLACEHOLDER" class="w-full h-full object-cover rounded-xl shadow-lg" alt="Creative Narrative Image"/>
     </div>
     <div class="p-6 md:p-12 text-center md:text-left">
       <div class="text-6xl text-primary/20 mb-[-20px] font-serif leading-none inline-block">"</div>
-      <p class="quote mb-6 text-xl md:text-3xl leading-relaxed text-gray-900 font-bold tracking-tight">
+      <p class="quote mb-6 text-xl md:text-3xl leading-relaxed text-gray-900 font-bold tracking-tight italic">
         {{user_quote}}
       </p>
-      <p class="text-textSecondary text-base md:text-lg mb-8 leading-relaxed max-w-lg mx-auto md:mx-0">
-        {{user_story}}
-      </p>
+      <div class="text-textSecondary text-base md:text-lg mb-8 leading-relaxed max-w-lg mx-auto md:mx-0 font-medium">
+        {{story_problem}}<br/><br/>
+        {{story_action}}<br/><br/>
+        <strong class="text-gray-900">{{story_result}}</strong>
+      </div>
       <div class="inline-flex flex-col md:flex-row items-center md:items-start bg-surface px-6 py-4 rounded-2xl border border-border text-center md:text-left shadow-sm gap-4">
         <div>
           <p class="text-base font-extrabold text-primary">
@@ -689,15 +691,15 @@ p { max-width: 650px; margin: auto; }
 <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
 <div class="p-6">
   <div class="metric">{{proof_1_value}}</div>
-  <p class="text-textSecondary font-medium tracking-wide uppercase text-sm">{{proof_1_label}}</p>
+  <p class="text-textSecondary font-medium tracking-wide uppercase text-sm font-bold">{{proof_1_label}}</p>
 </div>
 <div class="p-6">
   <div class="metric">{{proof_2_value}}</div>
-  <p class="text-textSecondary font-medium tracking-wide uppercase text-sm">{{proof_2_label}}</p>
+  <p class="text-textSecondary font-medium tracking-wide uppercase text-sm font-bold">{{proof_2_label}}</p>
 </div>
 <div class="p-6">
   <div class="metric">{{proof_3_value}}</div>
-  <p class="text-textSecondary font-medium tracking-wide uppercase text-sm">{{proof_3_label}}</p>
+  <p class="text-textSecondary font-medium tracking-wide uppercase text-sm font-bold">{{proof_3_label}}</p>
 </div>
 </div>
 </div>
@@ -902,19 +904,19 @@ p { max-width: 600px; margin: auto; }
 
 <body class="font-sans bg-surface">
 
-<section id="hero" class="section text-center bg-white border-b border-border pb-24" data-editable="hero">
+<section id="hero" class="section text-center bg-surface border-b border-border pb-24" data-editable="hero">
 <div class="container">
 <h1 class="text-4xl md:text-6xl font-extrabold mb-6 leading-tight">
   {{hero_headline}}
 </h1>
-<p class="text-xl text-textSecondary mb-10 max-w-2xl mx-auto">
+<p class="text-xl text-textSecondary mb-10 max-w-2xl mx-auto font-medium">
   {{hero_subheadline}}
 </p>
 <button class="btn-primary text-lg">
   {{hero_cta}}
 </button>
-<div class="mt-12 w-full max-w-5xl mx-auto bg-slate-50 rounded-3xl p-3 md:p-6 shadow-2xl border border-border">
-  <div class="bg-white rounded-2xl overflow-hidden border border-gray-100 shadow-sm flex items-center justify-center pt-4">
+<div class="mt-12 w-full max-w-5xl mx-auto bg-muted/5 rounded-3xl p-3 md:p-6 shadow-2xl border border-border">
+  <div class="bg-surface rounded-2xl overflow-hidden border border-border/10 shadow-sm flex items-center justify-center pt-4">
     <img src="AD_IMAGE_URL_PLACEHOLDER" class="w-full h-auto max-h-[350px] md:max-h-[550px] object-contain p-2 md:p-4" />
   </div>
 </div>
@@ -1080,11 +1082,11 @@ p { max-width: 600px; margin: auto; }
           --textPrimary: {{color_text_primary}};
           --textSecondary: {{color_text_secondary}};
         }
-        .text-brand-orange { color: var(--primary); }
-        .brand-orange { background-color: var(--primary); }
-        .bg-orange-100 { background-color: var(--primary-light); }
-        .glass-card { background: rgba(255, 255, 255, 0.9); backdrop-filter: blur(10px); border: 1px solid rgba(255, 255, 255, 0.2); }
-        .hero-gradient { background: linear-gradient(135deg, var(--primary-light) 0%, var(--background) 100%); }
+        .text-brand { color: var(--primary); }
+        .bg-brand { background-color: var(--primary); }
+        .bg-brand-light { background-color: var(--primary-light); }
+        .glass-card { background: var(--surface); backdrop-filter: blur(10px); border: 1px solid var(--border); }
+        .hero-gradient { background: linear-gradient(135deg, var(--background) 0%, var(--surface) 100%); }
         .surface-bg { background-color: var(--surface); }
     </style>
 </head>

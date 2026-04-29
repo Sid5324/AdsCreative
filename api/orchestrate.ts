@@ -24,37 +24,38 @@ export default async function handler(req, res) {
     // For simplicity, I'll just duplicate the logic from server.ts or move it to a shared file.
     
     const prompt = `
-You are the "Nexus-ACE" System (Version 2.5.12), an advanced multi-agent architecture for synthetic brand orchestration.
+You are the "Nexus-ACE" System (Version 2.7.0), a high-tier multi-agent architecture for generating high-conversion, brand-synchronized marketing funnels.
 
 ## MISSION
-Transform the provided Ad Creative and Brand Identity into a high-fidelity, high-conversion Landing Page.
+Synthesize the provided Ad Creative and Brand Identity into a professional, "award-worthy" Landing Page.
+
+## DESIGN SYSTEM (MANDATORY)
+- THEME: Modern, bold, and clean. Use high-contrast headings.
+- LAYOUT: Use multi-column sections, bento grids, and overlapping visual elements. Avoid "boxy" standard layouts.
+- COLOR: Interpolate brand colors (identified from the creative) into the background, buttons, and accents using Tailwind (e.g., bg-[#F43397] for primary).
+- INTERACTION: Every button should have a smooth hover lift/glow effect. Use transitions.
+- IMAGERY: Use the primary ad creative as the HERO image. Replace the 'src' with 'AD_IMAGE_URL_PLACEHOLDER'.
+- RESPONSIVENESS: Ensure full responsiveness (mobile/tablet/desktop).
 
 ## AGENT PROTOCOLS
-1. [AdAnalyzer]: Deconstruct vision data, color hierarchies, and spatial relationships.
-2. [SemanticBridge]: Synchronize ad value prop with the domain: \${brandUrl}.
-3. [DTR_Generator]: Synthesize a Design Token Registry (DTR) for visual consistency.
-4. [MasterRenderer]: Output complete, production-ready HTML with integrated Tailwind CSS.
+1. [AdAnalyzer (Vision)]: Identify core HEX colors, lighting, and the primary "Emotional Hook" from the creative.
+2. [SemanticBridge (Context)]: Synchronize the ad's offer with the ecosystem of ${brandUrl}. For example, if it's Meesho, use social commerce/reselling terminology.
+3. [DTR_Generator (Tokens)]: Construct a precise Design Token Registry.
+4. [MasterRenderer (Frontend)]: Output the final HTML + Tailwind production code.
 
-## INPUTS
-\${adImage.url ? \`- Source Image URL: \${adImage.url}\` : '- Vision Buffer: Ad Image Provided via multi-modal channel.'}
-- Target Architecture: \${templateObj?.name || 'Standard_Vertical'}
-- Target Domain: \${brandUrl}
+## INPUT DATA
+- Target Domain: ${brandUrl}
+- Ad Content: ${adImage.url ? `Image URL: ${adImage.url}` : 'Vision Buffer (Image provided in binary chunk)'}
+- Architecture: ${templateObj?.name || 'V2_High_Conversion'}
 
-## OUTPUT CONSTRAINTS
-- Return a valid JSON object only.
-- The 'code' field MUST contain the entire HTML including Hero, features, and footer.
-- The 'code' MUST use Tailwind CSS.
-- Replace the main ad image 'src' with 'AD_IMAGE_URL_PLACEHOLDER'.
-- Generate exactly 4 LOG items simulating the agent workflow.
+## OUTPUT SCHEMA
+- code: Complete HTML string (Head + Body). Include <script src="https://cdn.tailwindcss.com"></script>.
+- logs: 4 items (AdAnalyzer, SemanticBridge, DTR_Generator, MasterRenderer) with name, role, and a TECHNICAL status update.
+- dtr: Detailed registry including brandDna (voice, tone, audience), colors (hex), typography, and geometry.
 
-## TEMPLATE FOUNDATION
-\`\`\`html
-\${templateObj?.content || '<!-- Standard layout -->'}
-\`\`\`
-`.replace(/\${brandUrl}/g, brandUrl)
- .replace(/\${adImage\.url \? \`- Source Image URL: \${adImage\.url}\` : '- Vision Buffer: Ad Image Provided via multi-modal channel\.'}/g, adImage.url ? `- Source Image URL: ${adImage.url}` : '- Vision Buffer: Ad Image Provided via multi-modal channel.')
- .replace(/\${templateObj\?\.name \|\| 'Standard_Vertical'}/g, templateObj?.name || 'Standard_Vertical')
- .replace(/\${templateObj\?\.content \|\| '<!-- Standard layout -->'/g, templateObj?.content || '<!-- Standard layout -->');
+## SEED ARCHITECTURE
+${templateObj?.content || '<!-- Start from a clean, modern canvas -->'}
+`;
 
     const contents: any[] = [{ role: 'user', parts: [{ text: prompt }] }];
     
@@ -114,9 +115,18 @@ Transform the provided Ad Creative and Brand Identity into a high-fidelity, high
                     spacingUnit: { type: Type.STRING }
                   },
                   required: ["borderRadius", "spacingUnit"]
+                },
+                brandDna: {
+                  type: Type.OBJECT,
+                  properties: {
+                    voice: { type: Type.STRING },
+                    tone: { type: Type.STRING },
+                    audience: { type: Type.STRING }
+                  },
+                  required: ["voice", "audience"]
                 }
               },
-              required: ["colors", "typography", "geometry"]
+              required: ["colors", "typography", "geometry", "brandDna"]
             },
             code: { type: Type.STRING }
           },

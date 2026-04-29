@@ -30,6 +30,7 @@ export interface DesignTokenRegistry {
     voice: string;
     tone: string;
     audience: string;
+    hooks?: string[];
   };
 }
 
